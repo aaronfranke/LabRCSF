@@ -345,6 +345,29 @@ The Reference Canonical Skeleton Framework does not inhibit future expansion, ra
 
 Additional joints MAY be added as children of existing joints to accommodate specialized use cases, provided that they do not conflict with existing joint names or naming patterns. Within a skeleton, all joint/bone/node names MUST be unique. Elements such as ears, hair, wings, tails, other appendages, or any other bones/joints MAY be added as children of existing joints and used for any purpose, such as secondary animation, attachment points, virtual transforms, spring bone simulation, fine control over deformation, or any other purpose.
 
+## Joint Orientation
+
+The Reference Canonical Skeleton Framework defines required orientations for each joint. These orientations are consistent with the behavior of most software and standards based on right-handed coordinate systems, and are stated here explicitly to provide a clear standard.
+
+- The local +Y direction of the joint points along the length of the bone.
+- The local +X direction of the joint is perpendicular to the Y axis, and oriented such that the "primary" rotation of the "base" joint corresponds to a positive rotation around the local +X axis, with descendant joints following that orientation regardless of different ways those joints anatomically rotate. "Primary" rotation is based on human anatomy, and is defined in detail in the normative consequences below.
+- The local +Z direction of the joint is perpendicular to both the X and Y axes, and completes a right-handed coordinate system.
+
+These rules result in the following normative consequences, consistent with common software and standards found in right-handed Y-up coordinate systems:
+
+- A character's hips, spine, neck, chest, and head bones have minimal rotation relative to the baseline right-handed Y-up coordinate system. They have their local +X direction in the global +X direction, their local +Y direction in the global +Y direction, and their local +Z direction in the global +Z direction.
+  - For a human-anatomically-correct example rotation, a positive X rotation of these bones bends forward, as if the character is leaning forward.
+- A character's leg bones have their local +Y direction pointing in the global -Y direction (downwards), have their local +Z direction pointing in the global +Z direction, and have their local +X direction pointing in the global -X direction.
+  - For human-anatomically-correct example rotations, a positive X rotation of the upper leg bones will "kick" forward, and a negative X rotation of the lower leg bones will bend the knees consistent with human anatomy.
+- A character's arm bones have their local +Y direction pointing along the length of the arms, meaning for a character in T-pose, a character's left arm points in the global +X direction, and a character's right arm points in the global -X direction, or for a character in A-pose, a bit in the global -Y direction (downwards). The arm bones have their local +Z direction pointing in the global -Y direction (downwards) when in T-pose, or for a character in A-pose, a bit towards the character's spine/hips. The local +X axis completes the right-handed coordinate system.
+  - When comparing the left and right arms, their orientations are effectively rotated around the global Y axis by 180 degrees relative to each other, or equivalently, around their local Z axes by 180 degrees relative to each other. This means that both left and right arms have their local +Z direction pointing downwards when in T-pose (global -Y), with their local +X and +Y directions flipped relative to each other (left arm +X points global -Z, left arm +Y points global +X; right arm +X points +Z, right arm +Y points global -X).
+  - For human-anatomically-correct example rotations, a positive X rotation of the upper arm bones will contract the arms towards the character's torso, a positive X rotation of the hands and fingers will do the same, a positive Z rotation of the character's left lower arm (elbow) will bend the left lower arm forward, and a negative Z rotation of the character's right lower arm (elbow) will bend the right lower arm forward.
+- In many cases, a joint's local +Y direction points towards a child joint, meaning that the child joint's local translation will only have a positive Y component, and the X and Z components will be zero. For example, this applies within the spine, legs, arms, and fingers. However, child joints are not required to be placed along the length of a parent bone. This will usually not be the case if a joint has multiple children, such as a hand's multiple fingers, the hips joint which does not point towards its leg children. This also does not apply if a joint is a "leaf" and has no children.
+
+Applications which do not use Y-up coordinate systems still often have the same joint orientation conventions. For example, in Blender, +Z is the global up direction, and bones are still oriented with their local +Y direction along the length of the bone. Thus, the concept of "up" and "bone length" are not necessarily tied together. However, if applications have different joint orientation conventions, such as Unreal which uses +X as the bone length direction, then conversion will be required when importing and exporting RCSF to and from the application's native format.
+
+The Reference Canonical Skeleton Framework does not mandate a specific Euler rotation order. Runtimes and file formats using RCSF are expected to perform rotations using Quaternions, Rotors, or other rotation representations that do not require a specific Euler rotation order.
+
 ## Mathematical Framework
 
 ### Hierarchical Transform Concatenation
@@ -407,36 +430,6 @@ This transformation sequence:
 1. Converts from target base pose to neutral space
 2. Applies RCSF transformations
 3. Converts to target format's expected base pose
-
-### Practical Implementation
-
-#### Joint Orientation Alignment
-
-Different formats use varying local coordinate systems for joints. The RCSF uses consistent anatomical orientation:
-
-- **X-axis**: Points along bone length (distal direction)
-- **Y-axis**: Points toward anatomical "up" direction
-- **Z-axis**: Completes right-handed coordinate system
-
-When converting to target formats with different joint orientations:
-
-```python
-def align_joint_orientation(RCSF_transform, target_orientation):
-    alignment_matrix = calculate_alignment(RCSF_axes, target_axes)
-    return alignment_matrix * RCSF_transform * alignment_matrix.inverse()
-```
-
-#### Rotation Order Conversion
-
-RCSF uses XYZ Euler rotation order internally. For target formats using different orders:
-
-```python
-def convert_rotation_order(rotation_xyz, target_order):
-    # Convert to rotation matrix
-    R = euler_to_matrix(rotation_xyz, 'XYZ')
-    # Extract in target order
-    return matrix_to_euler(R, target_order)
-```
 
 ## Cross-Format Mapping Implementation
 
