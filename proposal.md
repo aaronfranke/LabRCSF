@@ -339,6 +339,24 @@ Similarly to the spine bones, extended joints can be used to represent additiona
 
 If a human or humanoid bipedal creature is rigged differently than the above medical bone mappings, such as for artistic reasons, it MAY still be considered a valid model that is usable as an animated character or avatar, but such rigging may lead to incorrect deformations, unexpected animation results, or other issues when used in applications expecting anatomically correct rigs. Deviations from the intended mappings are permitted but SHOULD be avoided whenever possible to ensure optimal interoperability across applications and platforms.
 
+### Differing finger and toe counts
+
+If a character has a different amount of fingers or toes compared to normal human anatomy, the joints which are present should be mapped as best as possible to the standard finger and toe names.
+
+For oligodactyl characters with fewer than 5 fingers or toes, prefer using names of joints close to the thumb/hallux, but only include the thumb/hallux itself if they are anatomically similar.
+
+- For example, if a character has a thumb and 2 (or 3) other fingers, use "Thumb", "Index", and "Middle" (and "Ring" if 3).
+- For example, if a character has a distinct hallux and 2 (or 3) other toes, use "Hallux", "IndexToe", and "MiddleToe" (and "RingToe" if 3).
+- For example, if a character has 3 (or 4) roughly-equal toes, use "IndexToe", "MiddleToe", and "RingToe" (and "PinkyToe" if 4), excluding "Hallux".
+
+For polydactyl characters with more than 5 fingers or toes, use the human anatomical names for the joints which are desired to be animated, and then use "Pre" and "Post" prefixes for the extra fingers or toes.
+
+- These prefixes correspond to the "preaxial" and "postaxial" medical terms, with "Pre" meaning in the direction of the thumb/hallux, and "Post" meaning in the direction of the pinky. It is also valid to go beyond those, for example, "PreThumb" or "PostPinky", if the extra fingers are outside the normal range of fingers.
+- For example, if a 6-fingered character has an extra finger inserted between the middle and ring fingers, it may be named "PreRing" or "PostMiddle", depending on if the animated behavior is intended to be more like the middle finger or ring finger.
+- For characters with many more fingers, prefixes may be stacked.
+
+Applications are not expected to handle polydactyl characters. Avatars of such characters are recommended to include rotation-copying node constraints on the extra fingers, indicating to applications that they should copy the movement of the extra fingers from the nearest standard fingers, allowing basic animations like closing all fingers into a fist to work correctly without special handling for the extra fingers. However, defining standardized names for such fingers allows applications which support special handling of such fingers to recognize them and have a standardized away to apply animations to them.
+
 ### Non-standard Joints
 
 The Reference Canonical Skeleton Framework does not inhibit future expansion, rather, it provides a common baseline for interoperability of common bipedal skeleton structures.
