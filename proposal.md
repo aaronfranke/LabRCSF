@@ -710,6 +710,70 @@ This appendix addresses **homogeneous humanoid skeleton** conversion—transform
 
 A future iteration of this framework should include creative rig variations, attachments and kinematic handles.
 
+## Viseme Blend Shapes
+
+Visemes, short for "visual phonemes", are blend shapes that represent the visual aspect of phonemes during human speech. They are used for lip syncing, the process of matching a character's mouth movements to spoken words.
+
+### Viseme Blend Shape Naming
+
+The following viseme names are defined by RCSF, as a superset of common viseme sets found in other standards linked below:
+
+| Viseme Name | IPA Phonemes    | Example Words                                              | Description                         |
+| ----------- | --------------- | ---------------------------------------------------------- | ----------------------------------- |
+| `VisemeSIL` | (silence)       | (silence)                                                  | Neutral, lips closed and relaxed    |
+| `VisemePP`  | p, b, m         | **p**at, **b**at, **m**at                                  | Lips fully closed, bilabial closure |
+| `VisemeFF`  | f, v            | **f**at, **v**at                                           | Lower lip touches upper teeth       |
+| `VisemeTH`  | ð, θ            | **th**is, **th**in                                         | Tongue between teeth                |
+| `VisemeDD`  | t, d            | **t**ip, **d**ip                                           | Tongue tip touches alveolar ridge   |
+| `VisemeKK`  | k, ɡ            | **k**id, **g**o                                            | Back of tongue touches soft palate  |
+| `VisemeCH`  | t͡ʃ d͡ʒ ʃ ʒ t͡s d͡z | **ch**at, **j**am, **sh**e, vi**s**ion, ca**ts**, ki**ds** | Lips rounded, jaw lowered slightly  |
+| `VisemeSS`  | s, z            | **s**it, **z**oom                                          | Teeth almost together, lips wide    |
+| `VisemeNN`  | n, l            | **n**ot, **l**ot                                           | Tongue presses ridge, lips apart    |
+| `VisemeRR`  | ɹ, ɻ, r         | **r**ed (varies by accent)                                 | Lips slightly rounded, cheeks firm  |
+| `VisemeWW`  | w, ʍ            | **w**hat, **hw**at (southern US accent)                    | Lips tightly rounded and protruded  |
+| `VisemeYY`  | j, ʝ, ʎ         | **y**es, **j**a (Dutch), caba**ll**o (Spanish)             | Lips spread, tongue high front      |
+| `VisemeAA`  | æ, ɑ, ɒ         | c**a**t, h**o**t, f**ou**ght (varies by accent)            | Oval mouth, jaw open                |
+| `VisemeEE`  | ɛ, eɪ, e        | b**e**d, m**a**y, m**e**sa (Spanish)                       | Mouth wider, jaw open slightly      |
+| `VisemeIH`  | ɪ, i            | t**i**p, t**ea**                                           | Lips spread, jaw high               |
+| `VisemeOH`  | oʊ, o           | t**oe**, g**o** (Indian accent) or **eau** (French)        | Lips rounded, jaw open slightly     |
+| `VisemeOU`  | u, ʊ            | b**oo**t, b**oo**k                                         | Lips rounded, slightly forward      |
+| `VisemeUH`  | ə, ɜ, ʌ, ɐ      | **a**bout, b**i**rd, b**u**t, n**u**t (varies by accent)   | Mostly neutral, lips open slightly  |
+
+Each example word corresponds to the listed phonemes in order. Some sounds may be merged in common English accents, in which cases a language or accent is specified in the table, otherwise the examples are based on General American English as spoken in the 21st century. For RR, those sounds are allophonic in English and most languages, therefore only one example word is provided, but the specific choice may vary by accent. For a reference on what each phoneme sounds like, see the "IPA Chart" link in the "Viseme References" section below.
+
+### Viseme Blend Shape Usage Rules
+
+- If a blend shape (morph target) exists for one of these listed visemes, it MUST have its name set to the corresponding name from the table above in order to be used as that viseme in an application's lip syncing. The names are case-sensitive. This ensures that applications can reliably identify and use the visemes by their names.
+
+- If a viseme is needed that is not defined here, they may still be added as blend shapes, however, not all runtime applications will recognize or use them. This standard is not intended to limit future expansion with new visemes for new mouth shapes, but rather to ensure a common baseline for compatibility.
+
+- If a runtime needs a viseme that is unavailable or missing, it may fall back to another viseme, or blend existing visemes, at the application's discretion. This includes the possibility of applications supporting custom visemes, with a fallback to this base definition to support characters/avatars without that custom viseme, and also allows applications to handle cases of missing visemes gracefully.
+
+- If a viseme exists but is not supported by an application or format, it may be safely ignored. For example, VRM only defines AA, EE, IH, OH, and OU, so other visemes would not be used when converting a RCSF model to VRM.
+
+- Visemes may be used for purposes other than lip syncing. For example, "VisemeWW" may be used as part of a "pog champ" facial expression.
+
+### Viseme Name Conversion
+
+The RCSF viseme blend shape naming is designed to be close to other existing standards. For convenience, here are some other standards and how to convert them to RCSF, with names from those standards quoted in `"`, and the names from RCSF in backticks (formatted as code):
+
+- To convert from VRM lip sync visemes: Capitalize the viseme names, and add the `Viseme` prefix, then the names match.
+
+- To convert from MPEG-4 FBA visemes: Replace "E" with `EE`, capitalize the viseme names, and add the `Viseme` prefix, then the names match.
+
+- To convert from VRChat visemes: Replace "e" with `EE`, replace "i" with `IH`, replace "o" with `OH`, replace "u" with `OU`, capitalize the viseme names, and add the `Viseme` prefix, then the names match.
+
+- To convert from Meta Horizon visemes: Replace "E" with `EE`, replace "I" with `IH`, replace "O" with `OH`, replace "U" with `OU`, capitalize the viseme names, and add the `Viseme` prefix, then the names match. Meta Horizon matches VRChat except for capitalization.
+
+### Viseme References
+
+- IPA Chart (highly recommended) https://www.ipachart.com/
+- VRChat Visemes https://wiki.vrchat.com/wiki/Visemes and https://creators.vrchat.com/avatars/animator-parameters/#viseme-values
+- MPEG-4 Face and Body Animation (FBA) https://visagetechnologies.com/uploads/2012/08/MPEG-4FBAOverview.pdf
+- Meta Horizon Visemes https://developers.meta.com/horizon/documentation/unity/audio-ovrlipsync-viseme-reference/
+- VRM Lip Sync https://github.com/vrm-c/vrm-specification/blob/master/specification/VRMC_vrm-1.0/expressions.md#lip-sync-procedural
+- ARPAbet Phoneme Set https://en.wikipedia.org/wiki/ARPABET and http://www.speech.cs.cmu.edu/cgi-bin/cmudict
+
 ## Conclusion
 
 This technical specification provides the implementation foundation for RCSF deployment while clearly defining scope boundaries and practical constraints. The mathematical framework and algorithmic approaches enable systematic conversion between diverse humanoid skeletal standards while maintaining anatomical consistency and quality assurance throughout the process.
